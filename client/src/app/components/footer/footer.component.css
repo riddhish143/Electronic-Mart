@@ -1,13 +1,17 @@
-
 .footer1 {
     display: flex;
     width: 100%;
-    height: 50px;
-    align-content: center;
+    height: 70px; /* Increased height for better visibility */
+    align-items: center; /* Changed from align-content to align-items for better alignment */
     position: sticky;
+    background-color: #007bff; /* Added a background color for a modern look */
+    color: white; /* Changed text color to white for contrast */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Added a subtle shadow for depth */
 }
+
 .footer-note {
-    font-size:18px;
+    font-size: 20px; /* Increased font size for better readability */
     margin: auto;
- 
+    text-align: center; /* Centered the text for better alignment */
+    font-family: Arial, sans-serif; /* Changed font family for a clean look */
 }
