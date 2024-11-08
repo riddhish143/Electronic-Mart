@@ -1,62 +1,46 @@
 pipeline {
     agent any
 
-    environment {
-        REPO_URL = 'https://github.com/riddhish143/Electronic-Mart.git'
-        DOCKER_COMPOSE_FILE = 'docker-compose.yaml'
-        GITHUB_CREDENTIALS = credentials('github-pat') // Reference the stored credential
-        AWS_PUBLIC_IP = '13.200.200.254' // Replace with your actual AWS instance public IP
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Install Docker') {
             steps {
-                // Checkout the code from GitHub using the PAT
-                git url: "${REPO_URL}", branch: 'main', credentialsId: 'github-pat'
-            }
-        }
-
-        stage('Build Docker Images') {
-            steps {
-                // Build Docker images for the services
                 script {
-                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} build'
+                    // Update the package database
+                    sh 'sudo apt-get update'
+                    // Install required packages
+                    sh 'sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common'
+                    // Add Docker’s official GPG key
+                    sh 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -'
+                    // Add the Docker repository
+                    sh 'sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"'
+                    // Update the package database again
+                    sh 'sudo apt-get update'
+                    // Install Docker
+                    sh 'sudo apt-get install -y docker-ce'
+                    // Add the current user to the Docker group
+                    sh 'sudo usermod -aG docker $USER'
                 }
             }
         }
 
-        stage('Run Docker Compose') {
+        stage('Install Docker Compose') {
             steps {
-                // Run the Docker Compose to start the services
                 script {
-                    sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} up -d'
+                    // Download the latest version of Docker Compose
+                    sh 'sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose'
+                    // Apply executable permissions to the binary
+                    sh 'sudo chmod +x /usr/local/bin/docker-compose'
+                    // Verify installation
+                    sh 'docker-compose --version'
                 }
             }
         }
-
-        stage('Curl Website') {
-            steps {
-                // Curl the website using the AWS instance public IP
-                script {
-                    sh "curl http://${AWS_PUBLIC_IP}" // Make sure the service is running on the expected port
-                }
-            }
-        }
-
-        // stage('Clean Up') {
-        //     steps {
-        //         // Clean up the Docker environment
-        //         script {
-        //             sh 'docker-compose -f ${DOCKER_COMPOSE_FILE} down'
-        //         }
-        //     }
-        // }
     }
 
     post {
         always {
-            // Archive the logs or any artifacts if needed
-            archiveArtifacts artifacts: '**/logs/*', allowEmptyArchive: true
+            // Clean up or notify if needed
+            echo 'Docker and Docker Compose installation completed.'
         }
     }
 }
