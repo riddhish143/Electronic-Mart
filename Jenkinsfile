@@ -4,15 +4,15 @@ pipeline {
     environment {
         REPO_URL = 'https://github.com/riddhish143/Electronic-Mart.git'
         DOCKER_COMPOSE_FILE = 'docker-compose.yaml'
-        GITHUB_CREDENTIALS = credentials('github-pat') // Reference the stored credential
-        AWS_PUBLIC_IP = '13.200.200.254' // Replace with your actual AWS instance public IP
+        GITHUB_CREDENTIALS = credentials('github-pat1') // Reference the stored credential
+        AWS_PUBLIC_IP = '13.233.195.233' // Replace with your actual AWS instance public IP
     }
 
     stages {
         stage('Checkout') {
             steps {
                 // Checkout the code from GitHub using the PAT
-                git url: "${REPO_URL}", branch: 'main', credentialsId: 'github-pat'
+                git url: "${REPO_URL}", branch: 'main', credentialsId: 'github-pat1'
             }
         }
 
